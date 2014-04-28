@@ -2,6 +2,7 @@
     <label class='control-label' for="service_key">{__("service_key")}:</label>
     <div class="controls">
         <input type="text" name="payment_data[processor_params][service_key]" id="service_key" value="{$processor_params.service_key}" class="input-text" />
+        <input type='hidden' name='payment_data[processor_params][currency]' id='currency' value='ZAR'>
     </div>
 </div>
 

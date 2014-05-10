@@ -158,6 +158,7 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 		}
 		fn_order_placement_routines ( 'route', $_REQUEST ['order_id'], false );
 	} elseif ($mode == 'cancel') {
+		// TODO Evaluate when this code is called
 		pnlog("Mode == cancel");
 		$order_info = fn_get_order_info ( $_REQUEST ['order_id'] );
 		$Reason = $_REQUEST['Reason'];

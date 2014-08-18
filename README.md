@@ -1,7 +1,7 @@
 Sage Pay Now - CS-Cart 4 Payment Gateway Module
 ===============================================
 
-Revision 1.1.2
+Revision 1.1.3
 
 Introduction
 ------------
@@ -53,7 +53,7 @@ A. Sage Pay Now Gateway Server Configuration Steps:
 7. Click "Allow credit card payments:"
 
 8. The Accept and Decline URLs should both be:
-	http://cscart_install/index.php
+	http://www.your_domain.co.za/index.php
 
 9. It is highly recommended that you "Make test mode active:" while you are still testing your site.
 
@@ -79,6 +79,8 @@ Here are two screenshots of the CS-Cart settings screen for the Sage Pay Now con
 Revision History
 ----------------
 
+* 08 Aug 2014/1.1.3 Amended P3 to be more descriptive and added M6
+                    Updated readme to read www.your_domain.co.za instead of 'cscart_install'
 * 10 May 2014/1.0.1	Added documentation and screenshots
 * 19 Apr 2014/1.0.0	First version
 

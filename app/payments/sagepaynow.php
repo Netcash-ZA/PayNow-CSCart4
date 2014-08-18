@@ -190,14 +190,17 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 			'm2' => '24ade73c-98cf-47b3-99be-cc7b867b3080',
 			'm4' => $return_url,
 			'm5' => $cancel_url,
-			'm6' => $notify_url,
+			// 'm6' => $notify_url,
 			'm10' => $callback_url,
 			'first_name' => $order_info ['b_firstname'],
 			'last_name' => $order_info ['b_lastname'],
 			'email_address' => $order_info ['email'],
 			'p2' => $m_payment_id,
 			'p4' => $total,
-			'p3' => __ ( 'text_sagepaynow_item_name' ) . ' - ' . $order_info ['order_id'],
+            // 18 Aug '14 modifed P3
+            // 'p3' => __ ( 'text_sagepaynow_item_name' ) . ' - ' . $order_info ['order_id'],
+			'p3' => __ ( 'text_sagepaynow_item_name' ) . ' (' . $order_info ['b_firstname'] . ' ' . $order_info ['b_lastname'] . ' - Order #' . $order_info ['order_id'] . ')',
+            'm6' => __ ( 'text_sagepaynow_item_name' ) . ' (' . $order_info ['b_firstname'] . ' ' . $order_info ['b_lastname'] . ' - Order #' . $order_info ['order_id'] . ')',
 			'description' => __ ( 'total_product_cost' ) 
 	);
 	

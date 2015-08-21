@@ -91,11 +91,11 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 	// Create an unique order ID
 	$m_payment_id = $m_payment_id . "_" . date("Ymds");
 
-	$return_url = fn_url ( "payment_notification.return?payment=sagepaynow&order_id=$m_payment_id", AREA, 'current' );
-	$cancel_url = fn_url ( "payment_notification.cancel?payment=sagepaynow&order_id=$m_payment_id", AREA, 'current' );
-	$notify_url = fn_url ( "payment_notification.notify?payment=sagepaynow&order_id=$m_payment_id", AREA, 'current' );
+	$return_url = fn_url ( "payment_notification.return?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
+	$cancel_url = fn_url ( "payment_notification.cancel?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
+	$notify_url = fn_url ( "payment_notification.notify?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
 
-	$callback_url = "dispatch=payment_notification.notify&payment=sagepaynow&order_id=$m_payment_id";
+	$callback_url = "dispatch=payment_notification.notify&payment=sagepaynow&order_id={$order_info['order_id']}";
 
 	$customerName = "{$order_info['b_firstname']} {$order_info['b_lastname']}";
 	$orderID = $order_info['order_id'];

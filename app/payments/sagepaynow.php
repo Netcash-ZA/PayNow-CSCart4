@@ -12,13 +12,7 @@ if (! defined ( 'BOOTSTRAP' )) {
 	die ( 'Access denied' );
 }
 
-function pn_order_id_from_ref($ref) {
-	// Get actual order ID from unique ID
-	$pieces = explode("_", $ref);
-	$order_id = $pieces[0];
-	return $order_id;
-}
-
+include 'sagepaynow/sagepaynow_common.inc';
 $order_id = null;
 if (empty ( $processor_data )) {
 	$order_id = pn_order_id_from_ref($_POST ['Reference']);
@@ -29,114 +23,10 @@ if (empty ( $processor_data )) {
 
 define ( 'PN_DEBUG', ( bool ) $processor_data ['processor_params'] ['debug'] );
 
-include 'sagepaynow/sagepaynow_common.inc';
 pnlog ( "Including sagepaynow.php from app/payments/sagepaynow" );
 pnlog ("Processor params: " . print_r($processor_data ['processor_params'],true));
 
 $sagepaynow_service_key = $processor_data ['processor_params'] ['service_key'];
-
-function pn_do_transaction( $order_id ) {
-
-	if (fn_check_payment_script ( 'sagepaynow.php', $order_id, $processor_data )) {
-		$order_info = fn_get_order_info ( $order_id, true );
-
-		$pp_response = array ();
-		$sagepaynow_statuses = $processor_data ['processor_params'] ['statuses'];
-		pnlog("sagepaynow statuses: " . print_r($sagepaynow_statuses,true));
-		$pnError = false;
-		$pnErrMsg = '';
-		$pnDone = false;
-		$pnData = array ();
-		$pnParamString = '';
-		pnlog ( 'Sage Pay Now IPN call received' );
-
-		// // Notify Sage Pay Now that information has been received
-		if (! $pnError && ! $pnDone) {
-			header ( 'HTTP/1.0 200 OK' );
-			flush ();
-		}
-
-		// // Get data sent by Sage Pay Now
-		if (! $pnError && ! $pnDone) {
-			pnlog ( 'Get posted data' );
-
-			// Posted variables from IPN
-			$pnData = pnGetData ();
-
-			pnlog ( 'Sage Pay Now Data: ' . print_r ( $pnData, true ) );
-
-			if ($pnData === false) {
-				$pnError = true;
-				$pnErrMsg = PN_ERR_BAD_ACCESS;
-			}
-		}
-
-		// Get internal cart
-		if (! $pnError && ! $pnDone) {
-			// TODO The line below shows too much data
-			// pnlog ( "Purchase:\n" . print_r ( $order_info, true ) );
-		}
-
-		pnlog ( "Checking data against internal order..." );
-
-		// Check data against internal order
-		if (! $pnError && ! $pnDone) {
-			// pnlog( 'Check data against internal order' );
-
-			// Check order amount
-			if (! pnAmountsEqual ( $pnData ['Amount'], fn_format_price ( $order_info ['total'], $processor_data ['processor_params'] ['currency'] ) )) {
-				$pnError = true;
-				$pnErrMsg = PN_ERR_AMOUNT_MISMATCH;
-			}
-		}
-
-		pnlog ( "Finished checking data against internal order. " );
-		pnlog ( "Errors: {$pnError} - {$pnErrMsg}" );
-
-		// // Check status and update order
-		if (! $pnError && ! $pnDone) {
-			pnlog ( 'Checking status and update order' );
-
-			$transaction_id = $pnData ['Reference'];
-
-			switch ($pnData ['TransactionAccepted']) {
-				case 'true' :
-					pnlog ( '- Complete' );
-					$pp_response ['order_status'] = $sagepaynow_statuses ['completed'];
-					break;
-				case 'false':
-                    pnlog( '- Failed' );
-                    $pp_response['order_status'] = $sagepaynow_statuses['denied'];
-                    break;
-				// TODO Remove not used section
-				//case 'false' :
-// 					case "PENDING" :
-// 						pnlog ( '- Pending' );
-// 						$pp_response ['order_status'] = $sagepaynow_statuses ['pending'];
-// 						break;
-				default :
-					// If unknown status, do nothing (safest course of action)
-					break;
-			}
-
-			$pp_response ['reason_text'] = $pnData ['Reason'];
-			$pp_response ['transaction_id'] = $transaction_id;
-			$pp_response ['customer_email'] = $pnData ['email_address'];
-
-			// TODO Re-evaluate this code for efficiency, clean up failed/pending duplicate
-			if ($pp_response ['order_status'] == $sagepaynow_statuses ['denied']) {
-				fn_change_order_status ( $order_id, $pp_response ['order_status'] );
-				pnlog ( "Transaction failed" );
-				fn_redirect ( $pnData ['Extra3'] . "&Reason=" . $pnData['Reason']);
-			} else {
-				fn_finish_payment ( $order_id, $pp_response );
-				pnlog ( "Transaction completed" );
-				fn_redirect ( $pnData ['Extra2'] );
-			}
-		}
-	}
-	exit ();
-}
 
 // Return (callback) from the Sage Pay Now website
 // Scroll the bottom to see form submit code

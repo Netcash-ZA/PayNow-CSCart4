@@ -56,9 +56,118 @@ define( 'PN_MSG_PENDING',
     'The payment is pending. Please note, you will receive another Instant'.
     ' Transaction Notification when the payment status changes to'.
     ' "Completed", or "Failed"' );
-    
 
 
+
+function pn_order_id_from_ref($ref) {
+    // Get actual order ID from unique ID
+    $pieces = explode("_", $ref);
+    $order_id = $pieces[0];
+    return $order_id;
+}
+
+function pn_do_transaction( $order_id ) {
+
+    if (fn_check_payment_script ( 'sagepaynow.php', $order_id, $processor_data )) {
+        $order_info = fn_get_order_info ( $order_id, true );
+
+        $pp_response = array ();
+        $sagepaynow_statuses = $processor_data ['processor_params'] ['statuses'];
+        pnlog("sagepaynow statuses: " . print_r($sagepaynow_statuses,true));
+        $pnError = false;
+        $pnErrMsg = '';
+        $pnDone = false;
+        $pnData = array ();
+        $pnParamString = '';
+        pnlog ( 'Sage Pay Now IPN call received' );
+
+        // // Notify Sage Pay Now that information has been received
+        if (! $pnError && ! $pnDone) {
+            header ( 'HTTP/1.0 200 OK' );
+            flush ();
+        }
+
+        // // Get data sent by Sage Pay Now
+        if (! $pnError && ! $pnDone) {
+            pnlog ( 'Get posted data' );
+
+            // Posted variables from IPN
+            $pnData = pnGetData ();
+
+            pnlog ( 'Sage Pay Now Data: ' . print_r ( $pnData, true ) );
+
+            if ($pnData === false) {
+                $pnError = true;
+                $pnErrMsg = PN_ERR_BAD_ACCESS;
+            }
+        }
+
+        // Get internal cart
+        if (! $pnError && ! $pnDone) {
+            // TODO The line below shows too much data
+            // pnlog ( "Purchase:\n" . print_r ( $order_info, true ) );
+        }
+
+        pnlog ( "Checking data against internal order..." );
+
+        // Check data against internal order
+        if (! $pnError && ! $pnDone) {
+            // pnlog( 'Check data against internal order' );
+
+            // Check order amount
+            if (! pnAmountsEqual ( $pnData ['Amount'], fn_format_price ( $order_info ['total'], $processor_data ['processor_params'] ['currency'] ) )) {
+                $pnError = true;
+                $pnErrMsg = PN_ERR_AMOUNT_MISMATCH;
+            }
+        }
+
+        pnlog ( "Finished checking data against internal order. " );
+        pnlog ( "Errors: {$pnError} - {$pnErrMsg}" );
+
+        // // Check status and update order
+        if (! $pnError && ! $pnDone) {
+            pnlog ( 'Checking status and update order' );
+
+            $transaction_id = $pnData ['Reference'];
+
+            switch ($pnData ['TransactionAccepted']) {
+                case 'true' :
+                    pnlog ( '- Complete' );
+                    $pp_response ['order_status'] = $sagepaynow_statuses ['completed'];
+                    break;
+                case 'false':
+                    pnlog( '- Failed' );
+                    $pp_response['order_status'] = $sagepaynow_statuses['denied'];
+                    break;
+                // TODO Remove not used section
+                //case 'false' :
+//                  case "PENDING" :
+//                      pnlog ( '- Pending' );
+//                      $pp_response ['order_status'] = $sagepaynow_statuses ['pending'];
+//                      break;
+                default :
+                    // If unknown status, do nothing (safest course of action)
+                    break;
+            }
+
+            $pp_response ['reason_text'] = $pnData ['Reason'];
+            $pp_response ['transaction_id'] = $transaction_id;
+            $pp_response ['customer_email'] = $pnData ['email_address'];
+
+            // TODO Re-evaluate this code for efficiency, clean up failed/pending duplicate
+            if ($pp_response ['order_status'] == $sagepaynow_statuses ['denied']) {
+                fn_change_order_status ( $order_id, $pp_response ['order_status'] );
+                pnlog ( "Transaction failed" );
+                fn_redirect ( $pnData ['Extra3'] . "&Reason=" . $pnData['Reason']);
+            } else {
+                fn_finish_payment ( $order_id, $pp_response );
+                pnlog ( "Transaction completed" );
+                fn_redirect ( $pnData ['Extra2'] );
+            }
+        }
+    }
+    exit ();
+}
 
 /**
  * pnlog
@@ -102,7 +211,7 @@ function pnlog( $msg = '', $close = false )
 
 /**
  * pnGetData
- * 
+ *
  */
 function pnGetData()
 {
@@ -122,14 +231,14 @@ function pnGetData()
 
 /**
  * pnAmountsEqual
- * 
+ *
  * Checks to see whether the given amounts are equal using a proper floating
  * point comparison with an Epsilon which ensures that insignificant decimal
  * places are ignored in the comparison.
- * 
+ *
  * eg. 100.00 is equal to 100.0001
  *
- * @param $amount1 Float 1st amount for comparison 
+ * @param $amount1 Float 1st amount for comparison
  * @param $amount2 Float 2nd amount for comparison
  */
 function pnAmountsEqual( $amount1, $amount2 )

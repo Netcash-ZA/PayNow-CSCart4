@@ -12,12 +12,16 @@ if (! defined ( 'BOOTSTRAP' )) {
 	die ( 'Access denied' );
 }
 
-if (empty ( $processor_data )) {
-	$order_id = $_POST ['Reference'];
-
+function pn_order_id_from_ref($ref) {
 	// Get actual order ID from unique ID
-	$pieces = explode("_", $order_id);
+	$pieces = explode("_", $ref);
 	$order_id = $pieces[0];
+	return $order_id;
+}
+
+$order_id = null;
+if (empty ( $processor_data )) {
+	$order_id = pn_order_id_from_ref($_POST ['Reference']);
 
 	$order_info = fn_get_order_info ( $order_id );
 	$processor_data = fn_get_processor_data ( $order_info ['payment_id'] );
@@ -34,9 +38,21 @@ $sagepaynow_service_key = $processor_data ['processor_params'] ['service_key'];
 // Return (callback) from the Sage Pay Now website
 // Scroll the bottom to see form submit code
 if (defined ( 'PAYMENT_NOTIFICATION' )) {
-	if ($mode == 'notify' && ! empty ( $_REQUEST ['order_id'] )) {
 
-		if (fn_check_payment_script ( 'sagepaynow.php', $_POST ['Reference'], $processor_data )) {
+	// CC callback will have &order_id={ID} set
+	// A notification for retail/EFT will have it set as Reference
+	$order_id = isset($_REQUEST ['order_id']) ? $_REQUEST ['order_id'] : null;
+
+	if( !$order_id ) {
+		$order_id = isset($_POST['Reference']) ? pn_order_id_from_ref($_POST ['Reference']) : null;
+	}
+
+	$pn_callback = $mode == 'notify' || $_POST['TransactionAccepted'] == true;
+	// CC notification or EFT or none?
+
+	if ($pn_callback && $order_id !== null) {
+
+		if (fn_check_payment_script ( 'sagepaynow.php', $order_id, $processor_data )) {
 			$pp_response = array ();
 			$sagepaynow_statuses = $processor_data ['processor_params'] ['statuses'];
 			pnlog("sagepaynow statuses: " . print_r($sagepaynow_statuses,true));

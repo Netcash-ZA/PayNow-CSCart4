@@ -100,11 +100,11 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 	$customerName = "{$order_info['b_firstname']} {$order_info['b_lastname']}";
 	$orderID = $order_info['order_id'];
 	$customerID = $order_info['user_id']; // TODO: Not sure if this customer ID is correct..
-	$sageGUID = "TBC";
+	$sageGUID = "88950107-bea8-4e83-b54a-edbfff19e49a";
 
 	$payArray = array (
 			'm1' => $sagepaynow_service_key,
-			'm2' => '24ade73c-98cf-47b3-99be-cc7b867b3080',
+			'm2' => $sageGUID,//'24ade73c-98cf-47b3-99be-cc7b867b3080',
 			'm5' => $return_url,
 			'm6' => $cancel_url,
 			// 'm6' => $notify_url,
@@ -121,7 +121,7 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 			'description' => __ ( 'total_product_cost' ),
 
 			'p3' => "{$customerName} | {$orderID}",
-			'm3' => "$sageGUID",
+			// 'm3' => "$sageGUID",
 			'm4' => "{$customerID}",
 	);
 

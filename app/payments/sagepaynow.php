@@ -123,11 +123,11 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 				if ($pp_response ['order_status'] == $sagepaynow_statuses ['denied']) {
 					fn_change_order_status ( $order_id, $pp_response ['order_status'] );
 					pnlog ( "Transaction failed" );
-					fn_redirect ( $pnData ['Extra2'] . "&Reason=" . $pnData['Reason']);
+					fn_redirect ( $pnData ['Extra3'] . "&Reason=" . $pnData['Reason']);
 				} else {
 					fn_finish_payment ( $order_id, $pp_response );
 					pnlog ( "Transaction completed" );
-					fn_redirect ( $pnData ['Extra1'] );
+					fn_redirect ( $pnData ['Extra2'] );
 				}
 			}
 		}
@@ -193,7 +193,8 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 	$payArray = array (
 			'm1' => $sagepaynow_service_key,
 			'm2' => '24ade73c-98cf-47b3-99be-cc7b867b3080',
-			'm5' => $cancel_url,
+			'm5' => $return_url,
+			'm6' => $cancel_url,
 			// 'm6' => $notify_url,
 			'm10' => $callback_url,
 			'first_name' => $order_info ['b_firstname'],

@@ -1,7 +1,7 @@
 Sage Pay Now - CS-Cart 4 Payment Gateway Module
 ===============================================
 
-Revision 1.1.3
+Revision 2.0.0
 
 Introduction
 ------------
@@ -24,7 +24,7 @@ If you are using a web hosting control panel such as cPanel or Plesk, it will be
 
 If your database is not hosted you can use an application such as SQLYog to install the database file.
 
-A 30 day trial of SQLYog can be downloaded here: 
+A 30 day trial of SQLYog can be downloaded here:
 https://www.webyog.com/product/downloads
 
 Once SQLYog is running, connect to your database and run the file.
@@ -55,7 +55,10 @@ A. Sage Pay Now Gateway Server Configuration Steps:
 8. The Accept and Decline URLs should both be:
 	http://www.your_domain.co.za/index.php
 
-9. It is highly recommended that you "Make test mode active:" while you are still testing your site.
+9. The Notify and Redirect URLs should both be:
+	http://www.your_domain.co.za/app/payments/sagepaynow/paynow_callback.php
+
+10. It is highly recommended that you "Make test mode active:" while you are still testing your site.
 
 B. CS-Cart Steps:
 
@@ -79,6 +82,7 @@ Here are two screenshots of the CS-Cart settings screen for the Sage Pay Now con
 Revision History
 ----------------
 
+* 25 Aug 2015/2.0.0 Added support for Retail & EFT payments
 * 08 Aug 2014/1.1.3 Amended P3 to be more descriptive and added M6
                     Updated readme to read www.your_domain.co.za instead of 'cscart_install'
 * 10 May 2014/1.0.1	Added documentation and screenshots

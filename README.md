@@ -52,13 +52,10 @@ A. Sage Pay Now Gateway Server Configuration Steps:
 6. Type in your Email address
 7. Click "Allow credit card payments:"
 
-8. The Accept and Decline URLs should both be:
-	http://www.your_domain.co.za/index.php
+8. The Accept, Decline, Notify and Redirect URLs should all be:
+	http://www.YOUR_DOMAIN.co.za/app/payments/sagepaynow/paynow_callback.php
 
-9. The Notify and Redirect URLs should both be:
-	http://www.your_domain.co.za/app/payments/sagepaynow/paynow_callback.php
-
-10. It is highly recommended that you "Make test mode active:" while you are still testing your site.
+9. It is highly recommended that you "Make test mode active:" while you are still testing your site.
 
 B. CS-Cart Steps:
 

@@ -38,7 +38,8 @@ function pn_load_paynow() {
  */
 function pn_get_redirect_url() {
 	// $url_for_redirect = fn_url ( "orders" );
-	$url_for_redirect =  "../../../orders";
+	// $url_for_redirect =  "../../../orders";
+	$url_for_redirect =  "../../../index.php?dispatch=orders.search";
 	return $url_for_redirect;
 }
 
@@ -53,7 +54,7 @@ $url_for_redirect = pn_get_redirect_url();
 
 pnlog(__FILE__ . " POST: " . print_r($_REQUEST, true) );
 
-$pn_callback = $mode == 'notify' || $_POST['TransactionAccepted'] == true;
+$pn_callback = $mode == 'notify' || ( isset($_POST['TransactionAccepted']) && $_POST['TransactionAccepted'] == true );
 	// CC notification or EFT or none?
 
 

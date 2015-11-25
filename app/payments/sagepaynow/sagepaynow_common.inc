@@ -154,15 +154,19 @@ function pn_do_transaction( $order_id ) {
             $pp_response ['transaction_id'] = $transaction_id;
             $pp_response ['customer_email'] = $pnData ['email_address'];
 
+            $return_url = fn_url ( "payment_notification.return?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
+            $cancel_url = fn_url ( "payment_notification.cancel?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
+
             // TODO Re-evaluate this code for efficiency, clean up failed/pending duplicate
             if ($pp_response ['order_status'] == $sagepaynow_statuses ['denied']) {
                 fn_change_order_status ( $order_id, $pp_response ['order_status'] );
-                pnlog ( "Transaction failed" );
-                fn_redirect ( $pnData ['Extra3'] . "&Reason=" . $pnData['Reason']);
+                pnlog ( "Transaction failed. Returning to {$cancel_url}" );
+
+                fn_redirect ( $cancel_url . "&Reason=" . $pnData['Reason']);
             } else {
                 fn_finish_payment ( $order_id, $pp_response );
-                pnlog ( "Transaction completed" );
-                fn_redirect ( $pnData ['Extra2'] );
+                pnlog ( "Transaction completed. Returning to {$return_url}" );
+                fn_redirect ( $return_url );
             }
         }
     }

@@ -15,7 +15,8 @@ if (! defined ( 'BOOTSTRAP' )) {
 include 'sagepaynow/sagepaynow_common.inc';
 $order_id = null;
 if (empty ( $processor_data )) {
-	$order_id = pn_order_id_from_ref($_POST ['Reference']);
+	$ref = isset($_POST ['Reference']) ? $_POST ['Reference'] : null;
+	$order_id = pn_order_id_from_ref($ref);
 
 	$order_info = fn_get_order_info ( $order_id );
 	$processor_data = fn_get_processor_data ( $order_info ['payment_id'] );
@@ -106,9 +107,9 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 			'm1' => $sagepaynow_service_key,
 			'm2' => $sageGUID,//'24ade73c-98cf-47b3-99be-cc7b867b3080',
 			'm5' => $return_url,
-			'm6' => $cancel_url,
+			// 'm6' => $cancel_url,
 			// 'm6' => $notify_url,
-			'm10' => $callback_url,
+			// 'm10' => $callback_url,
 			'first_name' => $order_info ['b_firstname'],
 			'last_name' => $order_info ['b_lastname'],
 			'email_address' => $order_info ['email'],

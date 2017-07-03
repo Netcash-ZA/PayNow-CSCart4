@@ -72,10 +72,6 @@ B. CS-Cart Steps:
 
 You are now ready to transact. Remember to turn of "Make test mode active:" when you are ready to go live.
 
-Here are two screenshots of the CS-Cart settings screen for the Sage Pay Now configuration:
-![alt tag](http://cscart.gatewaymodules.com/cscart_screenshot1.png)
-![alt tag](http://cscart.gatewaymodules.com/cscart_screenshot2.png)
-
 Revision History
 ----------------
 
@@ -86,11 +82,6 @@ Revision History
 * 19 Apr 2014/1.0.0	First version
 
 Tested with CS-Cart 4 version 4.1.3
-
-Demo Site
----------
-There is a demo site if you want to see osCommerce and the Sage Pay Now gateway in action:
-http://cscart.gatewaymodules.com
 
 Feedback, issues & feature requests
 -----------------------------------

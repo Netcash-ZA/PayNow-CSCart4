@@ -1,4 +1,11 @@
 <div class="control-group">
+    <label class='control-label' for="account_number">{__("account_number")}:</label>
+    <div class="controls">
+        <input type="text" name="payment_data[processor_params][account_number]" id="account_number" value="{$processor_params.account_number}" class="input-text" />
+    </div>
+</div>
+
+<div class="control-group">
     <label class='control-label' for="service_key">{__("service_key")}:</label>
     <div class="controls">
         <input type="text" name="payment_data[processor_params][service_key]" id="service_key" value="{$processor_params.service_key}" class="input-text" />
@@ -30,7 +37,7 @@
                 <option value="{$k}" {if (isset($processor_params.statuses.completed) && $processor_params.statuses.completed == $k) || (!isset($processor_params.statuses.completed) && $k == 'P')}selected="selected"{/if}>{$s}</option>
                 {/foreach}
             </select>
-        </div>    
+        </div>
     </div>
 
     <div class="control-group">

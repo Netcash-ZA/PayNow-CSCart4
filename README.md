@@ -72,18 +72,9 @@ B. CS-Cart Steps:
 
 You are now ready to transact. Remember to turn of "Make test mode active:" when you are ready to go live.
 
-Revision History
-----------------
+Issues & Feature Requests
+-------------------------
 
-* 25 Aug 2015/2.0.0 Added support for Retail & EFT payments
-* 08 Aug 2014/1.1.3 Amended P3 to be more descriptive and added M6
-                    Updated readme to read www.your_domain.co.za instead of 'cscart_install'
-* 10 May 2014/1.0.1	Added documentation and screenshots
-* 19 Apr 2014/1.0.0	First version
+We welcome your feedback.
 
-Tested with CS-Cart 4 version 4.1.3
-
-Feedback, issues & feature requests
------------------------------------
-If you have any feedback please contact Sage Pay South Africa or log an issue on GitHub
-
+Please contact Sage Pay South Africa with any questions or issues.

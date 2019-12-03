@@ -1,13 +1,13 @@
 <?php
 /**
- * sagepaynow_common.inc
+ * paynow_common.inc
  */
 
 //// Create user agent string
 // User agent constituents (for cURL)
 define( 'PN_SOFTWARE_NAME', 'CSCart' );
 define( 'PN_SOFTWARE_VER', "4.1.3" );
-define( 'PN_MODULE_NAME', 'SagePayNow-CSCart4' );
+define( 'PN_MODULE_NAME', 'paynow-CSCart4' );
 define( 'PN_MODULE_VER', '1.0.0' );
 
 // Features
@@ -37,7 +37,7 @@ define( 'PN_EPSILON', 0.01 );
 define( 'PN_ERR_AMOUNT_MISMATCH', 'Amount mismatch' );
 define( 'PN_ERR_BAD_ACCESS', 'Bad access of page' );
 define( 'PN_ERR_BAD_SOURCE_IP', 'Bad source IP address' );
-define( 'PN_ERR_CONNECT_FAILED', 'Failed to connect to Sage Pay Now' );
+define( 'PN_ERR_CONNECT_FAILED', 'Failed to connect to Netcash Pay Now' );
 define( 'PN_ERR_INVALID_SIGNATURE', 'Security signature mismatch' );
 define( 'PN_ERR_NO_SESSION', 'No saved session found for IPN transaction' );
 define( 'PN_ERR_ORDER_ID_MISSING_URL', 'Order ID not present in URL' );
@@ -68,33 +68,33 @@ function pn_order_id_from_ref($ref) {
 
 function pn_do_transaction( $order_id ) {
 
-    if (fn_check_payment_script ( 'sagepaynow.php', $order_id, $processor_data )) {
+    if (fn_check_payment_script ( 'paynow.php', $order_id, $processor_data )) {
         $order_info = fn_get_order_info ( $order_id, true );
 
         $pp_response = array ();
-        $sagepaynow_statuses = $processor_data ['processor_params'] ['statuses'];
-        pnlog("sagepaynow statuses: " . print_r($sagepaynow_statuses,true));
+        $paynow_statuses = $processor_data ['processor_params'] ['statuses'];
+        pnlog("paynow statuses: " . print_r($paynow_statuses,true));
         $pnError = false;
         $pnErrMsg = '';
         $pnDone = false;
         $pnData = array ();
         $pnParamString = '';
-        pnlog ( 'Sage Pay Now IPN call received' );
+        pnlog ( 'Netcash Pay Now IPN call received' );
 
-        // // Notify Sage Pay Now that information has been received
+        // // Notify Netcash Pay Now that information has been received
         if (! $pnError && ! $pnDone) {
             header ( 'HTTP/1.0 200 OK' );
             flush ();
         }
 
-        // // Get data sent by Sage Pay Now
+        // // Get data sent by Netcash Pay Now
         if (! $pnError && ! $pnDone) {
             pnlog ( 'Get posted data' );
 
             // Posted variables from IPN
             $pnData = pnGetData ();
 
-            pnlog ( 'Sage Pay Now Data: ' . print_r ( $pnData, true ) );
+            pnlog ( 'Netcash Pay Now Data: ' . print_r ( $pnData, true ) );
 
             if ($pnData === false) {
                 $pnError = true;
@@ -133,17 +133,17 @@ function pn_do_transaction( $order_id ) {
             switch ($pnData ['TransactionAccepted']) {
                 case 'true' :
                     pnlog ( '- Complete' );
-                    $pp_response ['order_status'] = $sagepaynow_statuses ['completed'];
+                    $pp_response ['order_status'] = $paynow_statuses ['completed'];
                     break;
                 case 'false':
                     pnlog( '- Failed' );
-                    $pp_response['order_status'] = $sagepaynow_statuses['denied'];
+                    $pp_response['order_status'] = $paynow_statuses['denied'];
                     break;
                 // TODO Remove not used section
                 //case 'false' :
 //                  case "PENDING" :
 //                      pnlog ( '- Pending' );
-//                      $pp_response ['order_status'] = $sagepaynow_statuses ['pending'];
+//                      $pp_response ['order_status'] = $paynow_statuses ['pending'];
 //                      break;
                 default :
                     // If unknown status, do nothing (safest course of action)
@@ -154,11 +154,11 @@ function pn_do_transaction( $order_id ) {
             $pp_response ['transaction_id'] = $transaction_id;
             $pp_response ['customer_email'] = $pnData ['email_address'];
 
-            $return_url = fn_url ( "payment_notification.return?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
-            $cancel_url = fn_url ( "payment_notification.cancel?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
+            $return_url = fn_url ( "payment_notification.return?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
+            $cancel_url = fn_url ( "payment_notification.cancel?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
 
             // TODO Re-evaluate this code for efficiency, clean up failed/pending duplicate
-            if ($pp_response ['order_status'] == $sagepaynow_statuses ['denied']) {
+            if ($pp_response ['order_status'] == $paynow_statuses ['denied']) {
                 fn_change_order_status ( $order_id, $pp_response ['order_status'] );
                 pnlog ( "Transaction failed. Returning to {$cancel_url}" );
 
@@ -199,7 +199,7 @@ function pnlog( $msg = '', $close = false )
             if( !$fh )
             {
                 $pathinfo = pathinfo( __FILE__ );
-                $fh = fopen( $pathinfo['dirname'] .'/sagepaynow.log', 'a+' );
+                $fh = fopen( $pathinfo['dirname'] .'/paynow.log', 'a+' );
             }
 
             // If file was successfully created

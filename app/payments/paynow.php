@@ -1,6 +1,6 @@
 <?php
 /**
- * sagepaynow.php
+ * paynow.php
  *
  * All in one script for submitting the form and handling the callback
  *
@@ -12,7 +12,7 @@ if (! defined ( 'BOOTSTRAP' )) {
 	die ( 'Access denied' );
 }
 
-include 'sagepaynow/sagepaynow_common.inc';
+include 'paynow/paynow_common.inc';
 $order_id = null;
 if (empty ( $processor_data )) {
 	$ref = isset($_POST ['Reference']) ? $_POST ['Reference'] : null;
@@ -24,12 +24,12 @@ if (empty ( $processor_data )) {
 
 define ( 'PN_DEBUG', ( bool ) $processor_data ['processor_params'] ['debug'] );
 
-pnlog ( "Including sagepaynow.php from app/payments/sagepaynow" );
+pnlog ( "Including paynow.php from app/payments/paynow" );
 pnlog ("Processor params: " . print_r($processor_data ['processor_params'],true));
 
-$sagepaynow_service_key = $processor_data ['processor_params'] ['service_key'];
+$paynow_service_key = $processor_data ['processor_params'] ['service_key'];
 
-// Return (callback) from the Sage Pay Now website
+// Return (callback) from the Netcash Pay Now website
 // Scroll the bottom to see form submit code
 if (defined ( 'PAYMENT_NOTIFICATION' )) {
 
@@ -47,7 +47,7 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 
 	} elseif ($mode == 'return') {
 		pnlog("Mode == return");
-		if (fn_check_payment_script ( 'sagepaynow.php', $_REQUEST ['order_id'] )) {
+		if (fn_check_payment_script ( 'paynow.php', $_REQUEST ['order_id'] )) {
 			$order_info = fn_get_order_info ( $_REQUEST ['order_id'], true );
 
 			if ($order_info ['status'] == STATUS_INCOMPLETED_ORDER) {
@@ -85,18 +85,18 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 		fn_order_placement_routines ( 'route', $_REQUEST ['order_id'] );
 	}
 } else {
-	// The form is about to be submitted to Sage Pay Now
+	// The form is about to be submitted to Netcash Pay Now
 	$total = fn_format_price ( $order_info ['total'], $processor_data ['processor_params'] ['currency'] );
 	$m_payment_id = $order_info ['order_id'];
 
 	// Create an unique order ID
 	$m_payment_id = $m_payment_id . "_" . date("Ymds");
 
-	$return_url = fn_url ( "payment_notification.return?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
-	$cancel_url = fn_url ( "payment_notification.cancel?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
-	$notify_url = fn_url ( "payment_notification.notify?payment=sagepaynow&order_id={$order_info['order_id']}", AREA, 'current' );
+	$return_url = fn_url ( "payment_notification.return?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
+	$cancel_url = fn_url ( "payment_notification.cancel?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
+	$notify_url = fn_url ( "payment_notification.notify?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
 
-	$callback_url = "dispatch=payment_notification.notify&payment=sagepaynow&order_id={$order_info['order_id']}";
+	$callback_url = "dispatch=payment_notification.notify&payment=paynow&order_id={$order_info['order_id']}";
 
 	$customerName = "{$order_info['b_firstname']} {$order_info['b_lastname']}";
 	$orderID = $order_info['order_id'];
@@ -104,7 +104,7 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 	$sageGUID = "88950107-bea8-4e83-b54a-edbfff19e49a";
 
 	$payArray = array (
-			'm1' => $sagepaynow_service_key,
+			'm1' => $paynow_service_key,
 			'm2' => $sageGUID,//'24ade73c-98cf-47b3-99be-cc7b867b3080',
 			'm5' => $return_url,
 			// 'm6' => $cancel_url,
@@ -116,14 +116,15 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 			'p2' => $m_payment_id,
 			'p4' => $total,
             // 18 Aug '14 modifed P3
-            // 'p3' => __ ( 'text_sagepaynow_item_name' ) . ' - ' . $order_info ['order_id'],
+            // 'p3' => __ ( 'text_paynow_item_name' ) . ' - ' . $order_info ['order_id'],
 
-            'm6' => __ ( 'text_sagepaynow_item_name' ) . ' (' . $order_info ['b_firstname'] . ' ' . $order_info ['b_lastname'] . ' - Order #' . $order_info ['order_id'] . ')',
+            'm6' => __ ( 'text_paynow_item_name' ) . ' (' . $order_info ['b_firstname'] . ' ' . $order_info ['b_lastname'] . ' - Order #' . $order_info ['order_id'] . ')',
 			'description' => __ ( 'total_product_cost' ),
 
 			'p3' => "{$customerName} | {$orderID}",
 			// 'm3' => "$sageGUID",
 			'm4' => "{$customerID}",
+			'm14' => "1",
 	);
 
 	$inputs = '';
@@ -132,14 +133,14 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 	}
 
 	$msg = fn_get_lang_var ( 'text_cc_processor_connection' );
-	$msg = str_replace ( '[processor]', 'Sage Pay Now', $msg );
+	$msg = str_replace ( '[processor]', 'Netcash Pay Now', $msg );
 
 	pnlog ( "payArray: " . print_r ( $payArray, true ) );
 
 	echo <<<EOT
     <html>
-    <body onLoad="document.sagepaynow_form.submit();">
-    <form action="https://paynow.sagepay.co.za/site/paynow.aspx" method="post" name="sagepaynow_form">
+    <body onLoad="document.paynow_form.submit();">
+    <form action="https://paynow.netcash.co.za/site/paynow.aspx" method="post" name="paynow_form">
     $inputs
 
     </form>

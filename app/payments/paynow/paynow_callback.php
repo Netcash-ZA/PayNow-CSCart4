@@ -28,8 +28,8 @@ function pn_load_system() {
  * Load PayNow functions/files
  */
 function pn_load_paynow() {
-	// require_once '../sagepaynow.php';
-	require_once 'sagepaynow_common.inc';
+	// require_once '../paynow.php';
+	require_once 'paynow_common.inc';
 	return;
 }
 

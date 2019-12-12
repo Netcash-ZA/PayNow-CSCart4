@@ -12,7 +12,7 @@ Download and Database Table Installation Instructions
 ------------------------------------------------
 
 1. Download the files from Github:
-* https://github.com/Netcash/PayNow-CSCart4/archive/master.zip
+* https://github.com/Netcash-ZA/PayNow-CSCart4/archive/master.zip
 
 Copy the files into your CS-Cart /app /design folders.
 

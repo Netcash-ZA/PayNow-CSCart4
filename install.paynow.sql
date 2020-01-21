@@ -7,6 +7,7 @@ REPLACE INTO cscart_language_values (`lang_code`,`name`,`value`) VALUES ('EN','t
 REPLACE INTO cscart_language_values (`lang_code`,`name`,`value`) VALUES ('EN','text_paynow_item_description','Shipping, Handling, Discounts and Taxes Included');
 
 REPLACE INTO cscart_language_values (`lang_code`,`name`,`value`) VALUES ('EN','text_service_key','Service Key');
+REPLACE INTO cscart_language_values (`lang_code`,`name`,`value`) VALUES ('EN','text_do_tokenization','Tokenize Credit Card?');
 REPLACE INTO cscart_language_values (`lang_code`,`name`,`value`) VALUES ('EN','text_debug','Debug');
 REPLACE INTO cscart_language_values (`lang_code`,`name`,`value`) VALUES ('EN','text_true','True');
 REPLACE INTO cscart_language_values (`lang_code`,`name`,`value`) VALUES ('EN','text_false','False');

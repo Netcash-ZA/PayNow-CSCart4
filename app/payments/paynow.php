@@ -28,6 +28,7 @@ pnlog ( "Including paynow.php from app/payments/paynow" );
 pnlog ("Processor params: " . print_r($processor_data ['processor_params'],true));
 
 $paynow_service_key = $processor_data ['processor_params'] ['service_key'];
+$do_tokenization = $processor_data ['processor_params'] ['do_tokenization'];
 
 // Return (callback) from the Netcash Pay Now website
 // Scroll the bottom to see form submit code
@@ -124,7 +125,7 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 			'p3' => "{$customerName} | {$orderID}",
 			// 'm3' => "$sageGUID",
 			'm4' => "{$customerID}",
-			'm14' => "1",
+			'm14' => (bool) $do_tokenization ? "1" : "0",
 	);
 
 	$inputs = '';

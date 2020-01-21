@@ -14,6 +14,16 @@
 </div>
 
 <div class="control-group">
+    <label class='control-label' for="do_tokenization">{__("text_do_tokenization")}:</label>
+    <div class="controls">
+        <select name="payment_data[processor_params][do_tokenization]" id="do_tokenization">
+            <option value="1" {if $processor_params.do_tokenization}selected="selected"{/if}>{__("true")}</option>
+            <option value="0" {if !$processor_params.do_tokenization}selected="selected"{/if}>{__("false")}</option>
+        </select>
+    </div>
+</div>
+
+<div class="control-group">
     <label class='control-label' for="debug">{__("text_debug")}:</label>
     <div class="controls">
         <select name="payment_data[processor_params][debug]" id="debug">

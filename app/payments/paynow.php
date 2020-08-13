@@ -113,7 +113,8 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 			// 'm10' => $callback_url,
 			'first_name' => $order_info ['b_firstname'],
 			'last_name' => $order_info ['b_lastname'],
-			'email_address' => $order_info ['email'],
+			'm9' => $order_info ['email'],
+			// 'm11' => $order_info ['cell'],
 			'p2' => $m_payment_id,
 			'p4' => $total,
             // 18 Aug '14 modifed P3
@@ -126,6 +127,7 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 			// 'm3' => "$sageGUID",
 			'm4' => "{$customerID}",
 			'm14' => (bool) $do_tokenization ? "1" : "0",
+
 	);
 
 	$inputs = '';

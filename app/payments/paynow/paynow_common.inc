@@ -128,29 +128,52 @@ function pn_do_transaction( $order_id ) {
         if (! $pnError && ! $pnDone) {
             pnlog ( 'Checking status and update order' );
 
+			$reason_text = $pnData ['Reason'];
             $transaction_id = $pnData ['Reference'];
 
             switch ($pnData ['TransactionAccepted']) {
                 case 'true' :
                     pnlog ( '- Complete' );
+
+					// Processed—the payment was received.
+					// Complete—all work on the order was completed.
+					// Open—the order was placed and created in the store database, but it hasn’t been processed yet.
+
                     $pp_response ['order_status'] = $paynow_statuses ['completed'];
                     break;
                 case 'false':
-                    pnlog( '- Failed' );
-                    $pp_response['order_status'] = $paynow_statuses['denied'];
+                    pnlog( "- Failed for reason: {$pnData['Reason']}" );
+
+                    $wasCancelled = stristr($pnData['Reason'], 'cancelled');
+                    $wasDeclined = stristr($pnData['Reason'], 'declined');
+
+					if($wasCancelled !== false) {
+						// If the user cancelled, redirect to cancel URL.
+						pnlog("\t - Order cancelled by user.");
+						$pp_response['order_status'] = $paynow_statuses['canceled'];
+						$reason_text = "The transaction was cancelled";
+					}
+					else if ($wasDeclined !== false) {
+						// Declined by gateway. Invalid card, etc.
+						pnlog("\t - Order declined by gateway.");
+						$pp_response['order_status'] = $paynow_statuses['declined'];
+						$reason_text = "The transaction was declined by the gateway ";
+					} else {
+						pnlog("\t - Unknown/Generic failure.");
+						$pp_response['order_status'] = $paynow_statuses['failed'];
+						// Use gateway message
+						$reason_text = $pnData ['Reason'];
+					}
+
+
                     break;
-                // TODO Remove not used section
-                //case 'false' :
-//                  case "PENDING" :
-//                      pnlog ( '- Pending' );
-//                      $pp_response ['order_status'] = $paynow_statuses ['pending'];
-//                      break;
                 default :
                     // If unknown status, do nothing (safest course of action)
                     break;
             }
 
-            $pp_response ['reason_text'] = $pnData ['Reason'];
+            // Use reason provided by gateway in user message
+            $pp_response ['reason_text'] = $reason_text;
             $pp_response ['transaction_id'] = $transaction_id;
             $pp_response ['customer_email'] = $pnData ['email_address'];
 

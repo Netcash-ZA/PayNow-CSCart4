@@ -104,29 +104,36 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 	$customerID = $order_info['user_id']; // TODO: Not sure if this customer ID is correct..
 	$sageGUID = "88950107-bea8-4e83-b54a-edbfff19e49a";
 
+	// $order_info['b_phone'] and $order_info['s_phone'] values also exist
+	// 10 characters, starting with 0.
+	// No intl numbers
+	$phone = isset($order_info['phone']) ? str_replace(["+","-","(",")"], "", $order_info['phone']) : "";
+	// Remove "27"
+	$formattedPhone = substr($phone, 0, 2) == '27' ? ("0" . substr($phone, 2)) : $phone;
+
 	$payArray = array (
-			'm1' => $paynow_service_key,
-			'm2' => $sageGUID,//'24ade73c-98cf-47b3-99be-cc7b867b3080',
-			'm5' => $return_url,
-			// 'm6' => $cancel_url,
-			// 'm6' => $notify_url,
-			// 'm10' => $callback_url,
-			'first_name' => $order_info ['b_firstname'],
-			'last_name' => $order_info ['b_lastname'],
-			'm9' => $order_info ['email'],
-			// 'm11' => $order_info ['cell'],
-			'p2' => $m_payment_id,
-			'p4' => $total,
-            // 18 Aug '14 modifed P3
-            // 'p3' => __ ( 'text_paynow_item_name' ) . ' - ' . $order_info ['order_id'],
+		'm1' => $paynow_service_key,
+		'm2' => $sageGUID,//'24ade73c-98cf-47b3-99be-cc7b867b3080',
+		'm5' => $return_url,
+		// 'm6' => $cancel_url,
+		// 'm6' => $notify_url,
+		// 'm10' => $callback_url,
+		// 'first_name' => $order_info ['b_firstname'],
+		// 'last_name' => $order_info ['b_lastname'],
+		'm9' => $order_info ['email'],
+		'm11' => $formattedPhone,
+		'p2' => $m_payment_id,
+		'p4' => $total,
+		// 18 Aug '14 modifed P3
+		// 'p3' => __ ( 'text_paynow_item_name' ) . ' - ' . $order_info ['order_id'],
 
-            'm6' => __ ( 'text_paynow_item_name' ) . ' (' . $order_info ['b_firstname'] . ' ' . $order_info ['b_lastname'] . ' - Order #' . $order_info ['order_id'] . ')',
-			'description' => __ ( 'total_product_cost' ),
+		'm6' => __ ( 'text_paynow_item_name' ) . ' (' . $order_info ['b_firstname'] . ' ' . $order_info ['b_lastname'] . ' - Order #' . $order_info ['order_id'] . ')',
+		'description' => __ ( 'total_product_cost' ),
 
-			'p3' => "{$customerName} | {$orderID}",
-			// 'm3' => "$sageGUID",
-			'm4' => "{$customerID}",
-			'm14' => (bool) $do_tokenization ? "1" : "0",
+		'p3' => "{$customerName} | {$orderID}",
+		// 'm3' => "$sageGUID",
+		'm4' => "{$customerID}",
+		'm14' => (bool) $do_tokenization ? "1" : "0",
 
 	);
 

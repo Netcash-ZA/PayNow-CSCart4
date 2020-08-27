@@ -66,6 +66,32 @@ function pn_order_id_from_ref($ref) {
     return $order_id;
 }
 
+/**
+ * Check if this is a 'offline' payment like EFT or retail
+ */
+function pn_is_offline() {
+
+	/*
+	Returns 2 for EFT
+	Returns 3 for Retail
+	*/
+	$offline_methods = [2, 3];
+
+	// If !$accepted, means it's the callback.
+	// If $accepted, and in array, means it's the actual called response
+	$accepted = isset($_POST['TransactionAccepted']) ? $_POST['TransactionAccepted'] == 'true' : false;
+	// $isPending = isset($_POST['Reason']) ? stristr($_POST['Reason'], 'pending') !== false : false;
+	$method = isset($_POST['Method']) ? (int) $_POST['Method'] : null;
+	pnlog('Checking if offline: ' . print_r(array(
+		"Accepted" => $accepted,
+		"Pending" => $isPending,
+		"Method" => (int) $_POST['Method'],
+	), true));
+
+	return !$accepted && in_array($method, $offline_methods);
+	// return (!$accepted || $isPending) && in_array($method, $offline_methods);
+}
+
 function pn_do_transaction( $order_id ) {
 
     if (fn_check_payment_script ( 'paynow.php', $order_id, $processor_data )) {

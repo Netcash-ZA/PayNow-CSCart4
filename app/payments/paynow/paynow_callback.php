@@ -52,25 +52,21 @@ pn_load_paynow();
 // Redirect URL for users using EFT/Retail payments to notify them the order's pending
 $url_for_redirect = pn_get_redirect_url();
 
-pnlog(__FILE__ . " POST: " . print_r($_REQUEST, true) );
+$offline = pn_is_offline();
+pnlog("IS OFFLINE? " . ($offline ? 'Yes' : 'No') );
 
-$pn_callback = $mode == 'notify' || ( isset($_POST['TransactionAccepted']) && $_POST['TransactionAccepted'] == true );
-	// CC notification or EFT or none?
-
-
-if( isset($_POST) && !empty($_POST) ) {
+if( isset($_POST) && !empty($_POST) && !$offline ) {
 
 	// This is the notification coming in!
 	// Act as an IPN request and forward request to Credit Card method.
 	// Logic is exactly the same
-
 	pn_do_transaction( pn_order_id_from_ref($_POST['Reference']) );
-
 	die();
 
 } else {
-	// Probably calling the "redirect" URL
-
+	// Probably calling the "redirect" URL,
+	// OR, the payment is still Pending, e.g., EFT
+	pnlog(__FILE__ . " POST: " . print_r($_REQUEST, true) );
 	pnlog(__FILE__ . ' Probably calling the "redirect" URL');
 
 	if( $url_for_redirect ) {

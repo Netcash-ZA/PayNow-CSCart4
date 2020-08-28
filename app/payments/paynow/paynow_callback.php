@@ -39,8 +39,11 @@ function pn_load_paynow() {
 function pn_get_redirect_url() {
 	// $url_for_redirect = fn_url ( "orders" );
 	// $url_for_redirect =  "../../../orders";
-	$url_for_redirect =  "../../../index.php?dispatch=orders.search";
-	return $url_for_redirect;
+	// $url_for_redirect =  "../../../index.php?dispatch=orders.search";
+
+	$order_id = pn_order_id_from_ref($_POST['Reference']);
+
+	return fn_url ( "payment_notification.return?payment=paynow&order_id={$order_id}", AREA, 'current' );;
 }
 
 // Load System

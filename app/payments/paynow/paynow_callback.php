@@ -20,6 +20,16 @@ function pn_load_system() {
 	    $e->output();
 	}
 
+	// PN_DEBUG not defined yet?
+	$enable_debug = 1; // on by default. @TODO: Get processor data
+	// $processor = fn_get_processor_data_by_name('paynow.php');
+	if(isset($processor_data)) {
+		$enable_debug = isset($processor_data ['processor_params'] ['debug']) ? $processor_data ['processor_params'] ['debug'] : false;
+	}
+	if( !defined( 'PN_DEBUG') ) {
+		define( 'PN_DEBUG', (bool) $enable_debug );
+	}
+
 	// require( '../../../index.php' );
 	// require( '../../../init.php' );
 }

@@ -92,8 +92,19 @@ if (defined ( 'PAYMENT_NOTIFICATION' )) {
 		$pp_response ["reason_text"] = $Reason;
 		pnlog("Reason for transaction failure:" . $Reason);
 
-		fn_finish_payment ( $_REQUEST ['order_id'], $pp_response, false );
-		fn_order_placement_routines ( 'route', $_REQUEST ['order_id'] );
+		// fn_finish_payment ( $_REQUEST ['order_id'], $pp_response, false );
+		if($order_info && $order_info['user_id']!=0){
+			fn_login_user($order_info['user_id']);
+		}
+
+		$cart_url = fn_url ( "checkout.cart", AREA, 'current' );
+		fn_redirect($cart_url);
+		exit;
+
+		// Why does 'fn_order_placement_routines' clear the cart even with clear_cart=false specified
+		// $clear_cart = false;
+		// $force_notification = false;
+		// fn_order_placement_routines ( 'route', $_REQUEST ['order_id'], $force_notification, $clear_cart);
 	}
 } else {
 	// The form is about to be submitted to Netcash Pay Now

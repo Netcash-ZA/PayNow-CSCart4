@@ -208,14 +208,23 @@ function pn_do_transaction( $order_id ) {
             $cancel_url = fn_url ( "payment_notification.cancel?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
 
             // TODO Re-evaluate this code for efficiency, clean up failed/pending duplicate
-            if ($pp_response ['order_status'] == $paynow_statuses ['denied']) {
+            $denied_statuses = [
+            	isset($paynow_statuses ['denied']) ? $paynow_statuses ['denied'] : null,
+            	isset($paynow_statuses ['canceled']) ? $paynow_statuses ['canceled'] : null,
+            ];
+            if ( in_array($pp_response ['order_status'], $denied_statuses) ) {
                 fn_change_order_status ( $order_id, $pp_response ['order_status'] );
-                pnlog ( "Transaction failed. Returning to {$cancel_url}" );
+                pnlog ( "Transaction failed/cancelled. Returning to {$cancel_url}" );
 
                 fn_redirect ( $cancel_url . "&Reason=" . $pnData['Reason']);
             } else {
                 fn_finish_payment ( $order_id, $pp_response );
+                if($order_info && $order_info['user_id']!=0) {
+                    fn_login_user($order_info['user_id']);
+                }
                 pnlog ( "Transaction completed. Returning to {$return_url}" );
+
+                // if guest, return with $success_url?
                 fn_redirect ( $return_url );
             }
         }

@@ -41,7 +41,7 @@ function pn_get_redirect_url() {
 	// $url_for_redirect =  "../../../orders";
 	// $url_for_redirect =  "../../../index.php?dispatch=orders.search";
 
-	$order_id = pn_order_id_from_ref($_POST['Reference']);
+	$order_id = pn_order_id_from_ref(isset($_POST['Reference'])?$_POST['Reference']:null);
 
 	return fn_url ( "payment_notification.return?payment=paynow&order_id={$order_id}", AREA, 'current' );;
 }

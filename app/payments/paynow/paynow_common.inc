@@ -84,8 +84,8 @@ function pn_is_offline() {
 	$method = isset($_POST['Method']) ? (int) $_POST['Method'] : null;
 	pnlog('Checking if offline: ' . print_r(array(
 		"Accepted" => $accepted,
-		"Pending" => $isPending,
-		"Method" => (int) $_POST['Method'],
+		// "Pending" => $isPending,
+		"Method" => (int) $method,
 	), true));
 
 	return !$accepted && in_array($method, $offline_methods);
@@ -201,8 +201,9 @@ function pn_do_transaction( $order_id ) {
             // Use reason provided by gateway in user message
             $pp_response ['reason_text'] = $reason_text;
             $pp_response ['transaction_id'] = $transaction_id;
-            $pp_response ['customer_email'] = $pnData ['email_address'];
+            $pp_response ['customer_email'] = isset($pnData ['email_address']) ? $pnData ['email_address'] : '';
 
+            // $success_url = fn_url ( "checkout.complete?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
             $return_url = fn_url ( "payment_notification.return?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
             $cancel_url = fn_url ( "payment_notification.cancel?payment=paynow&order_id={$order_info['order_id']}", AREA, 'current' );
 
@@ -236,7 +237,7 @@ function pnlog( $msg = '', $close = false )
     global $module;
 
     // Only log if debugging is enabled
-    if( PN_DEBUG )
+    if( defined('PN_DEBUG') && PN_DEBUG )
     {
         if( $close )
         {

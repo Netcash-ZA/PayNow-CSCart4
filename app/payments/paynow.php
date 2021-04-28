@@ -12,6 +12,9 @@ if (! defined ( 'BOOTSTRAP' )) {
 	die ( 'Access denied' );
 }
 
+$enable_debug = isset($processor_data ['processor_params'] ['debug']) ? $processor_data ['processor_params'] ['debug'] : false;
+define ( 'PN_DEBUG', ( bool ) $enable_debug );
+
 include 'paynow/paynow_common.inc';
 $order_id = null;
 if (empty ( $processor_data )) {
@@ -19,16 +22,23 @@ if (empty ( $processor_data )) {
 	$order_id = pn_order_id_from_ref($ref);
 
 	$order_info = fn_get_order_info ( $order_id );
-	$processor_data = fn_get_processor_data ( $order_info ['payment_id'] );
+	$processor_data = null;
+	if($order_info) {
+		$processor_data = fn_get_processor_data ( $order_info ['payment_id'] );
+	}
 }
 
-define ( 'PN_DEBUG', ( bool ) $processor_data ['processor_params'] ['debug'] );
+$paynow_service_key = null;
+$do_tokenization = null;
+if($processor_data) {
+	pnlog ( "Including paynow.php from app/payments/paynow" );
+	pnlog ("Processor params: " . print_r($processor_data ['processor_params'],true));
 
-pnlog ( "Including paynow.php from app/payments/paynow" );
-pnlog ("Processor params: " . print_r($processor_data ['processor_params'],true));
-
-$paynow_service_key = $processor_data ['processor_params'] ['service_key'];
-$do_tokenization = $processor_data ['processor_params'] ['do_tokenization'];
+	$paynow_service_key = $processor_data ['processor_params'] ['service_key'];
+	$do_tokenization = $processor_data ['processor_params'] ['do_tokenization'];
+} else {
+	pnlog ( "'processor_data' NOT SET" );
+}
 
 // Return (callback) from the Netcash Pay Now website
 // Scroll the bottom to see form submit code

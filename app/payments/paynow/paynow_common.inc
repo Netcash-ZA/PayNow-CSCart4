@@ -211,6 +211,7 @@ function pn_do_transaction( $order_id ) {
             $denied_statuses = [
             	isset($paynow_statuses ['denied']) ? $paynow_statuses ['denied'] : null,
             	isset($paynow_statuses ['canceled']) ? $paynow_statuses ['canceled'] : null,
+                isset($paynow_statuses ['declined']) ? $paynow_statuses ['declined'] : null,
             ];
             if ( in_array($pp_response ['order_status'], $denied_statuses) ) {
                 fn_change_order_status ( $order_id, $pp_response ['order_status'] );
